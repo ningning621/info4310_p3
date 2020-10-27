@@ -1,0 +1,51 @@
+input[type=range] {
+    -webkit-appearance: none;
+    width: 200px;
+    transform: rotate(270deg);
+    margin-top: 200px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 20px;
+    border: none;
+    border-radius: 50px;
+    background: #cdcdcd;
+    box-shadow: inset -5px 5px 10px #aaaaaa,
+              inset 5px -5px 10px #f0f0f0;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 26px;
+    width: 26px;
+    margin-top: -3px;
+    border-radius: 160px;
+    border-radius: 160px;
+    background: linear-gradient(225deg, #e4a539, #ffc443);
+    box-shadow:  -5px 5px 10px #c38d31,
+               5px -5px 10px #ffe14d;
+    cursor: pointer;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+button {
+  width: 75px;
+  height: 30px;
+  border-radius: 31px;
+  border: none;
+  background: linear-gradient(225deg, #ffc443, #e4a539);
+  box-shadow:  -5px 5px 10px #a27528,
+                5px -5px 10px #fff956;
+}
+
+button:focus {
+  outline: none;
+  border-radius: 31px;
+  background: #fdb73f;
+  box-shadow: inset -5px 5px 10px #a27528, 
+              inset 5px -5px 10px #fff956;
+}

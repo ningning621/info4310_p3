@@ -1,0 +1,71 @@
+<html>
+
+<head>
+    <title>Test Test Test</title>
+    <meta charset="utf-8" />
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="./helper.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/slider-css.css" media="all" />
+</head>
+  <body style="text-align: center; background-color: #fbfbfb; margin-top: 50;">
+  <!-- <audio id="jazz">
+    <source src="jazz.mp3" type='audio/mpeg; codecs="mp3"'>
+  </audio> -->
+  <input type="range" min="1" max="10" value="1" class="slider" id="active"/>
+  <input type="range" min="1" max="10" value="1" class="slider" id="arts"/>
+  <input type="range" min="1" max="10" value="1" class="slider" id="food"/>
+  <input type="range" min="1" max="10" value="1" class="slider" id="nightlife"/>
+  <input type="range" min="1" max="10" value="1" class="slider" id="shopping"/>
+  <button type="button" id="save_music_button">Save</button>
+  <button type="button" id="play_music_button">Play</button>
+  <script>
+
+    const getDataAndDrawVis = async() => {
+        let yelpData = await d3.csv("./datasets/yelp_pittsburgh_filtered.csv");
+        let sortedData = sortDataByType(yelpData);
+
+        setUpSliders(sortedData);
+    }
+
+    function setUpSliders(data) {
+      // note to self: https://neumorphism.io/ for colors
+      var activeSlider = document.getElementById("active");
+      var artsSlider = document.getElementById("arts");
+      var foodSlider = document.getElementById("food");
+      var nightSlider = document.getElementById("nightlife");
+      var shopSlider = document.getElementById("shopping");
+
+      var saveButton = document.getElementById("save_music_button");
+      saveButton.onclick = function() {
+        let total = parseInt(activeSlider.value) + parseInt(artsSlider.value)
+            + parseInt(foodSlider.value) + parseInt(nightSlider.value)
+            + parseInt(shopSlider.value);
+
+        let curatedList = [];
+        let finalList = curatedList.concat(
+          getListByTypeAndAmt(data["active"], Math.floor(parseInt(activeSlider.value)*10/total)),
+          getListByTypeAndAmt(data["arts"], Math.floor(parseInt(artsSlider.value)*10/total)),
+          getListByTypeAndAmt(data["food"], Math.floor(parseInt(foodSlider.value)*10/total)),
+          getListByTypeAndAmt(data["food"], Math.floor(parseInt(nightSlider.value)*10/total)),
+          getListByTypeAndAmt(data["food"], Math.floor(parseInt(shopSlider.value)*10/total))
+        )
+
+        console.log(finalList);
+      }
+
+      var output = document.getElementById("demo");
+      var audio = document.getElementById("jazz");
+      // Update the current slider value (each time you drag the slider handle)
+      // slider.oninput = function() {
+      //   // output.innerHTML = this.value;
+      //   audio.play()
+      //   audio.volume = this.value/10;
+      // }
+    }
+
+    getDataAndDrawVis()
+
+
+  </script>
+  </body>
+</html>
