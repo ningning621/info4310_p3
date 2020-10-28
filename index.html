@@ -5,6 +5,7 @@
   <link rel="shortcut icon" href="#"/>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/slider-css.css" media="all" />
 
   <title>Pittsburgh Itinerary, Exclusively Yours</title>
 
@@ -32,7 +33,7 @@
       flex-direction: row;
     }
 
-    button, input{
+    #selection {
       border-style: none;
       width: 200px;
       height:60px;
@@ -43,7 +44,7 @@
                    0px 0px 10px #ffffff;
     }
 
-    img{
+    img#location_image {
       width: 150px;
     }
 
@@ -67,11 +68,11 @@
   <div>
   <svg id="pittsburghmap" height="600" width="750" style="background: #fff; margin-left:50px" >
   </div>
-  <div style="margin-left: 80px"id="matching">
-    <h2>Go through the set of Pittsburgh locations recommended based on your preferred vibes!</h2>
+  <div style="margin-left: 80px" id="matching">
+    <!-- <h2>Go through the set of Pittsburgh locations recommended based on your preferred vibes!</h2>
     <div>
     <button href="#" id="start">Start!</button>
-    </div>
+    </div> -->
   </div>
   </div>
 
@@ -84,7 +85,7 @@
   const mapHeight = height - margin.top - margin.bottom;
   const map = svg.append("g")
                   .attr("transform","translate("+margin.left+","+margin.top+")");
-
+  // TODO: edit
   let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "image_url":"http://s3-media1.fl.yelpcdn.com/bphoto/l2XybXUHmdaHGhX9Ju8HZw/ms.jpg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food", "image_url":""}, {"name":"location 3" , "url":"www.google.com", "review count":3, "rating":3, "neighborhood":"test 3", "latitude":40.428219, "longitude":-79.97583, "category":"life", "type":"life", "image_url":"http://s3-media2.fl.yelpcdn.com/bphoto/yY7ESIgVEh7oPc-Qg06O3g/ms.jpg"}];
 
   // console.log(data);
@@ -93,7 +94,6 @@
     const pittsburgh = await d3.json("./datasets/pittsburgh_neighborhoods.json");
 
     var neighborhoods = topojson.feature(pittsburgh, pittsburgh.objects.Neighborhoods_);
-    // console.log(neighborhoods);
 
     // We use Mercator projection instead of a "better" projection because it's more familiar
     // It also leads to a flat line on the bottom of the city due to how the projection makes all
@@ -109,129 +109,192 @@
       .attr("class", "neighborhood")
       .attr("d", path);
 
-    // initiate the matching process
-    document.getElementById("start").onclick = function() {
-      nextRecommendation(0);
-      return false;
-    };
+    // // initiate the matching process
+    // document.getElementById("start").onclick = function() {
+    //   nextRecommendation(0);
+    //   return false;
+    // };
+
+
+    drawStereoVis();
 
     //initialize an empty dictionary for results
-    result = []
+    var result = [];
 
-    data.forEach(d => {
-      d.Position = projection([d.longitude, d.latitude]);
-    })
+    // data.forEach(d => {
+    //   d.Position = projection([d.longitude, d.latitude]);
+    // });
+  }
 
-    function nextRecommendation(num) {
-      var name = data[num]['name'];
-      var url = data[num]['url'];
-      var reviewCount = data[num]['review count'];
-      var neighborhood = data[num]['neighborhood'];
-      var rating = data[num]['rating'];
-      var latitude = data[num]["latitude"];
-      var longitude = data[num]["longitude"];
-      var category = data[num]["category"];
-      var type = data[num]["type"];
-      var image_url = data[num]["image_url"];
+  function drawStereoVis() {
+    var stereoDiv = d3.select("#matching");
+    stereoDiv.html("");
 
-      // Add html elements to screen
-      var prompt = d3.select("#matching");
-      prompt.html("");
-      prompt.append("h2").attr("id", "question").html(name);
-      prompt.append("img").attr("src", image_url)
-      prompt.append("p").attr("id", "category").html("Category: "+category);
-      prompt.append("p").attr("id", "type").html("Type: "+type);
-      prompt.append("p").attr("id", "neighborhood").html("Neighborhood: "+neighborhood);
-      prompt.append("p").attr("id", "rating").html("Rating: "+rating);
-      prompt.append("p").attr("id", "review-count").html("Review Count: "+reviewCount);
-      prompt.append("a").attr("id", "url").html("View more details").attr("href", url);
+    // add sliders to html
+    addSlider(stereoDiv, "active", "-80px", "100px");
+    addSlider(stereoDiv, "arts", "-200px", "100px");
+    addSlider(stereoDiv, "food", "90px", "83px");
+    addSlider(stereoDiv, "nightlife", "-200px", "275px", false);
+    addSlider(stereoDiv, "shopping", "5px", "350px", false);
 
-      // Add map pointers to map svg
-      drawMapPointers(data);
-      drawMapTextLabels(data[num], name)
+    // add icons for sliders
+    // Hamburger by MHD AZMI DWIPRANATA from the Noun Project
+    addSliderIcon(stereoDiv, "active_icon", "active", "./images/hamburger_icon.svg");
+    addSliderIcon(stereoDiv, "arts_icon", "arts", "./images/hamburger_icon.svg");
+    addSliderIcon(stereoDiv, "food_icon", "food", "./images/hamburger_icon.svg");
+    addSliderIcon(stereoDiv, "nightlife_icon", "nightlife", "./images/hamburger_icon.svg", false);
+    addSliderIcon(stereoDiv, "shopping_icon", "shopping", "./images/hamburger_icon.svg", false);
 
-      // Add yes and no buttons
-      var yes = prompt.append("input")
-                      .attr("type", "button")
-                      .attr("class", "selection")
-                      .attr("value", "Yes, I would love to visit🤩");
 
-      var no = prompt.append("input")
-                     .attr("type", "button")
-                     .attr("class", "selection")
-                     .attr("value", "Nah, not for me🤧");
+  }
 
-      prompt.append("p")
-            .attr("id", "page-number")
-            .html(num+1 + " / " + data.length + " locations");
+  function addSliderIcon(stereoDiv, id, sliderId, img_src, rotate = true) {
+    stereoDiv.append("img")
+      .attr("id", id)
+      .attr("src", img_src)
+      .attr("width", "26px")
+      .attr("height", "26px");
 
-      //if clicking on yes, add the data to the dictionary for final result, proceed to next question
-      yes.on("click", function(d, i) {
+    var slider = document.getElementById(sliderId).getBoundingClientRect();
+    var icon = document.getElementById(id);
 
-          result.push(data[num]);
+    if (rotate) {
+      icon.style.position = "absolute";
+      icon.style.top = (slider.top-30)+"px";
+      icon.style.left = (slider.left-8)+"px";
+    } else {
+      icon.style.position = "absolute";
+      icon.style.top = (slider.top-20)+"px";
+      icon.style.left = (slider.left+215)+"px";
+    }
+  }
 
-          if (num < data.length-1) {
-              d3.select('#temp-label').remove();
-              nextRecommendation(num+1);
-          }
-          else {
-              d3.select('#temp-label').remove();
-              finishRecommendation();
-          }
-      });
+  function addSlider(stereoDiv, sliderId, leftPosition, topPositon, rotate = true) {
+    stereoDiv.append("input")
+      .attr("min", 1)
+      .attr("max", 10)
+      .attr("value", 0)
+      .attr("type", "range")
+      .attr("class", "slider")
+      .attr("id", sliderId);
 
-      //if clicking on no, proceed to next question
-      no.on("click", function(d, i){
-        if (num < data.length-1){
-          d3.select('#temp-label').remove();
-          nextRecommendation(num+1);
+    var slider = document.getElementById(sliderId);
+    slider.style.position = "relative";
+    slider.style.left = leftPosition;
+    slider.style.top = topPositon;
+
+    if (rotate) {
+      slider.style.transform = "rotate(270deg)";
+
+    } else {
+    }
+  }
+
+  // draw matching vis for each recommendation
+  function nextRecommendation(num) {
+    var name = data[num]['name'];
+    var url = data[num]['url'];
+    var reviewCount = data[num]['review count'];
+    var neighborhood = data[num]['neighborhood'];
+    var rating = data[num]['rating'];
+    var latitude = data[num]["latitude"];
+    var longitude = data[num]["longitude"];
+    var category = data[num]["category"];
+    var type = data[num]["type"];
+    var image_url = data[num]["image_url"];
+
+    // Add html elements to screen
+    var prompt = d3.select("#matching");
+    prompt.html("");
+    prompt.append("h2").attr("id", "question").html(name);
+    prompt.append("img").attr("src", image_url).attr("class", "location_image")
+    prompt.append("p").attr("id", "category").html("Category: "+category);
+    prompt.append("p").attr("id", "type").html("Type: "+type);
+    prompt.append("p").attr("id", "neighborhood").html("Neighborhood: "+neighborhood);
+    prompt.append("p").attr("id", "rating").html("Rating: "+rating);
+    prompt.append("p").attr("id", "review-count").html("Review Count: "+reviewCount);
+    prompt.append("a").attr("id", "url").html("View more details").attr("href", url);
+
+    // Add map pointers to map svg
+    drawMapPointers(data);
+    drawMapTextLabels(data[num], name);
+
+    // Add yes and no buttons
+    var yes = prompt.append("input")
+                    .attr("type", "button")
+                    .attr("class", "selection")
+                    .attr("value", "Yes, I would love to visit🤩");
+
+    var no = prompt.append("input")
+                   .attr("type", "button")
+                   .attr("class", "selection")
+                   .attr("value", "Nah, not for me🤧");
+
+    prompt.append("p")
+          .attr("id", "page-number")
+          .html(num+1 + " / " + data.length + " locations");
+
+    //if clicking on yes, add the data to the dictionary for final result, proceed to next question
+    yes.on("click", function(d, i) {
+
+        result.push(data[num]);
+
+        if (num < data.length-1) {
+            d3.select('#temp-label').remove();
+            nextRecommendation(num+1);
         }
         else {
-          d3.select('#temp-label').remove();
-          finishRecommendation();
+            d3.select('#temp-label').remove();
+            finishRecommendation();
         }
-      });
-    }
+    });
 
-    // finish the recommendation process
-    function finishRecommendation(){
-      // console.log(result);
+    //if clicking on no, proceed to next question
+    no.on("click", function(d, i){
+      if (num < data.length-1){
+        d3.select('#temp-label').remove();
+        nextRecommendation(num+1);
+      }
+      else {
+        d3.select('#temp-label').remove();
+        finishRecommendation();
+      }
+    });
+  }
 
+  // finish the recommendation process and update UI for map and final itinerary
+  function finishRecommendation(){
+    // console.log(result);
+
+    d3.select("#matching")
+      .html("<h2>Check out your Pittsburgh itinerary!</h2>");
+      //But what about generating a new set of recommendations??
+
+    map.selectAll("image").remove();
+    drawMapPointers(result);
+
+    result.forEach((d, i) => {
+      drawMapTextLabels(d, d.name)
+
+      // TODO: build list for final recommendations
       d3.select("#matching")
-        .html("<h2>Check out your Pittsburgh itinerary!</h2>");
-        //But what about generating a new set of recommendations??
+        .append("li")
+        .html(d.name);
+    });
 
-      map.selectAll("image").remove();
+    d3.select("#matching")
+      .append("button")
+      .attr("id", "restart")
+      .html("Generate new itinerary🙌");
 
-      drawMapPointers(result);
-
-      result.forEach((d, i) =>{
-
-        drawMapTextLabels(d, d.name)
-
-        // TODO: build list for final recommendations
-        d3.select("#matching")
-          .append("li")
-          .html(d.name);
-
-      });
-
-      d3.select("#matching")
-        .append("button")
-        .attr("id", "restart")
-        .html("Generate new itinerary🙌");
-
-      d3.select("#restart")
-        .on("click", function() {
-
-          d3.selectAll('image').remove();
-          d3.selectAll('text').remove();
-          nextRecommendation(0);
-          result = [];
-          return false;
-
-      })
-    }
+    d3.select("#restart")
+      .on("click", function() {
+        d3.selectAll('image').remove();
+        d3.selectAll('text').remove();
+        nextRecommendation(0);
+        result = [];
+        return false;
+    });
   }
 
   // responsible for redraw the map pointers
@@ -264,6 +327,7 @@
        .attr('x', selectedLoc.Position[0])
        .attr('y', selectedLoc.Position[1] - 20);
   }
+
   requestData();
 
   </script>
