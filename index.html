@@ -10,6 +10,7 @@
 
   <style>
     body {
+      background-color: #FAFAFA;
       font-family: 'Lato', 'Helvetica', sans-serif;
       font-weight: 400;
     }
@@ -31,6 +32,32 @@
       flex-direction: row;
     }
 
+    button, input{
+      border-style: none;
+      width: 200px;
+      height:60px;
+      border-radius: 50px;
+      background: linear-gradient(145deg, #e1e1e1, #ffffff);
+      margin-right: 30px;
+      box-shadow:  5px 5px 10px #d5d5d5,
+                   0px 0px 10px #ffffff;
+    }
+
+    img{
+      width: 150px;
+    }
+
+    #matching{
+      width: 500px;
+      height: 600px;
+      padding: 50px 50px;
+      margin-left: 30px;
+      border-radius: 50px;
+      background: #FAFAFA;
+      box-shadow:  20px 20px 60px #d5d5d5,
+                   -20px -20px 60px #ffffff;
+    }
+
   </style>
 </head>
 
@@ -42,7 +69,9 @@
   </div>
   <div id="matching">
     <h2>Go through the set of Pittsburgh locations recommended based on your preferred vibes!</h2>
+    <div>
     <button href="#" id="start">Start!</button>
+    </div>
   </div>
   </div>
 
@@ -56,9 +85,7 @@
   const map = svg.append("g")
                   .attr("transform","translate("+margin.left+","+margin.top+")");
 
-  // let data = {"name":["21st Street Coffee And Tea","A & B Doughnuts", "location 3"] , "url":["http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "www.google.com"], "review count":[36,2,3], "rating":[4,5,3], "neighborhood":["Downtown", "Homestead", "test 3"] , "latitude":[40.44131, 40.40867615, 50], "longitude":[-80.00121, -79.90471649, -75], "category":["coffee", "donuts", "life"], "type":["food","food", "life"]};
-
-  let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food"}, {"name":"location 3" , "url":"www.google.com", "review count":3, "rating":3, "neighborhood":"test 3", "latitude":40.428219, "longitude":-79.97583, "category":"life", "type":"life"}];
+  let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "image_url":"http://s3-media1.fl.yelpcdn.com/bphoto/l2XybXUHmdaHGhX9Ju8HZw/ms.jpg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food", "image_url":""}, {"name":"location 3" , "url":"www.google.com", "review count":3, "rating":3, "neighborhood":"test 3", "latitude":40.428219, "longitude":-79.97583, "category":"life", "type":"life", "image_url":"http://s3-media2.fl.yelpcdn.com/bphoto/yY7ESIgVEh7oPc-Qg06O3g/ms.jpg"}];
 
   // console.log(data);
 
@@ -105,14 +132,21 @@
       var longitude = data[num]["longitude"];
       var category = data[num]["category"];
       var type = data[num]["type"];
+      var image_url = data[num]["image_url"];
 
       var prompt = d3.select("#matching");
       prompt.html("");
       prompt.append("h2").attr("id", "question").html(name);
-      prompt.append("h2").attr("id", "url").html(url);
-      prompt.append("h2").attr("id", "rating").html(rating);
+      prompt.append("img").attr("src", image_url)
+      prompt.append("p").attr("id", "category").html("Category: "+category);
+      prompt.append("p").attr("id", "type").html("Type: "+type);
+      prompt.append("p").attr("id", "neighborhood").html("Neighborhood: "+neighborhood);
+      prompt.append("p").attr("id", "rating").html("Rating: "+rating);
+      prompt.append("p").attr("id", "review-count").html("Review Count: "+reviewCount);
+      prompt.append("a").attr("id", "url").html("View more details").attr("href", url);
 
-       map.selectAll('.poi')
+
+      map.selectAll('.poi')
           .data(data)
           .enter()
           .append('image')
@@ -143,6 +177,10 @@
                      .attr("type", "button")
                      .attr("class", "selection")
                      .attr("value", "Nah, not for me🤧");
+
+      prompt.append("p")
+            .attr("id", "page-number")
+            .html(num+1 + " / " + data.length + " locations");
 
       //if clicking on yes, add the data to the dictionary for final result, proceed to next question
       yes.on("click", function(d, i) {
@@ -188,8 +226,7 @@
       console.log(result);
 
       d3.select("#matching")
-        .html("<h2>Check out your Pittsburgh itinerary!</h2>"+
-        "<button href=\"#\" id='restart'>Generate new itinerary🙌</button>");
+        .html("<h2>Check out your Pittsburgh itinerary!</h2>");
         //But what about generating a new set of recommendations??
 
       map.selectAll("image").remove();
@@ -208,7 +245,6 @@
 
       result.forEach((d, i) =>{
 
-
         map.append('text')
            .text(d.name)
            .attr('text-anchor', 'middle')
@@ -217,7 +253,16 @@
            .attr('x', d.Position[0])
            .attr('y', d.Position[1] - 20);
 
+        d3.select("#matching")
+          .append("li")
+          .html(d.name);
+
       });
+
+      d3.select("#matching")
+        .append("button")
+        .attr("id", "restart")
+        .html("Generate new itinerary🙌");
 
       d3.select("#restart")
         .on("click", function() {
