@@ -24,7 +24,7 @@
     }
 
     .neighborhood {
-      fill: #EEE;
+      fill: #EEEEEE;
       stroke: white;
       stroke-width: 2px;
     }
@@ -63,8 +63,13 @@
     }
 
     img.location_image {
-      width: 250px;
+      width: 200px;
+      margin-top: 10px;
       margin-bottom: 20px;
+      border-radius: 30px;
+      background: #fdb230;
+      box-shadow:  5px 5px 10px #d5d5d5,
+                   0px 0px 10px #ffffff;
     }
 
     #matching{
@@ -385,7 +390,7 @@
         d3.selectAll('image').remove();
         d3.selectAll('text').remove();
         result = [];
-        drawStereoVis();
+        drawStereoVis(sortedData, projection);
         return false;
     });
   }
