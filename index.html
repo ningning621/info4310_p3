@@ -48,8 +48,23 @@
                    0px 0px 10px #ffffff;
     }
 
+    .choiceSelection {
+      font-family: Lato;
+      font-size: 14px;
+      font-weight: bold;
+      border-style: none;
+      width: 200px;
+      height:40px;
+      border-radius: 50px;
+      margin: 10px;
+      background: #fdb73f;
+      box-shadow:  5px 5px 10px #d5d5d5,
+                   0px 0px 10px #ffffff;
+    }
+
     img.location_image {
-      width: 300px;
+      width: 250px;
+      margin-bottom: 20px;
     }
 
     #matching{
@@ -61,6 +76,32 @@
       background: #FAFAFA;
       box-shadow:  20px 20px 60px #d5d5d5,
                    -20px -20px 60px #ffffff;
+    }
+
+    /* progress indicator for results */
+    #page-number {
+      text-align: center;
+      margin-top: -20px;
+      color: #9A9A9A;
+    }
+
+    /* metadata (category, rating, neighborhood) styling */
+    .metadata {
+      font-size: 16px;
+      color: #4E4E4E;
+    }
+
+    #url {
+      text-decoration: none;
+      font-size: 16px;
+      color: #C38211;
+    }
+
+    /* Formatting for Y/N */
+    .choiceContainer {
+      display: flex;
+      align-items: center;
+      margin-top: 30px;
     }
 
   </style>
@@ -242,36 +283,49 @@
     var type = data[num]["type"];
     var image_url = data[num]["image_url"];
 
+    // Capitalization/grammar nits
+    category = category.charAt(0).toUpperCase() + category.slice(1);
+
     // Add html elements to screen
     var prompt = d3.select("#matching");
     prompt.html("");
+
+    prompt.append("p")
+          .attr("id", "page-number")
+          .html(num+1 + " of " + data.length + " locations");
+
     prompt.append("h2").attr("id", "question").html(name);
+
+    prompt.append("p")
+          .attr("class", "metadata")
+          .html(category + " · " + neighborhood + " · Average rating: " + rating + " ("+reviewCount+" reviews)")
+
     prompt.append("img").attr("src", image_url).attr("class", "location_image")
-    prompt.append("p").attr("id", "category").html("Category: "+category);
-    prompt.append("p").attr("id", "type").html("Type: "+type);
-    prompt.append("p").attr("id", "neighborhood").html("Neighborhood: "+neighborhood);
-    prompt.append("p").attr("id", "rating").html("Rating: "+rating);
-    prompt.append("p").attr("id", "review-count").html("Review Count: "+reviewCount);
-    prompt.append("a").attr("id", "url").html("View more details").attr("href", url);
+    // prompt.append("p").attr("id", "category").html("Category: "+category);
+    // prompt.append("p").attr("id", "type").html("Type: "+type);
+    // prompt.append("p").attr("id", "neighborhood").html("Neighborhood: "+neighborhood);
+    // prompt.append("p").attr("id", "rating").html("Rating: "+rating);
+    // prompt.append("p").attr("id", "review-count").html("Review Count: "+reviewCount);
+    prompt.append("br")
+    prompt.append("a").attr("id", "url").html("View more details →").attr("href", url);
 
     // Add map pointers to map svg
     drawMapPointers(data);
     drawMapTextLabels(data[num], name);
 
     // Add yes and no buttons
-    var yes = prompt.append("input")
+    var choiceDiv = prompt.append("div")
+                          .attr("class", "choiceContainer")
+
+    var yes = choiceDiv.append("input")
                     .attr("type", "button")
-                    .attr("class", "selection")
+                    .attr("class", "choiceSelection")
                     .attr("value", "Yes, I would love to visit🤩");
 
-    var no = prompt.append("input")
+    var no = choiceDiv.append("input")
                    .attr("type", "button")
-                   .attr("class", "selection")
+                   .attr("class", "choiceSelection")
                    .attr("value", "Nah, not for me🤧");
-
-    prompt.append("p")
-          .attr("id", "page-number")
-          .html(num+1 + " / " + data.length + " locations");
 
     //if clicking on yes, add the data to the dictionary for final result, proceed to next question
     yes.on("click", function(d, i) {
