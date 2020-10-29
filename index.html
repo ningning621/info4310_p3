@@ -91,6 +91,13 @@
   let sortedData = [];
   let result = [];
   let projection;
+  let typeToIconMap = {
+    "active": "./images/active_icon.svg",
+    "arts": "./images/arts_icon.svg",
+    "food": "./images/food_icon.svg",
+    "nightlife": "./images/nightlife_icon.svg",
+    "shopping": "./images/shopping_icon.svg",
+  };
 
   const requestData = async function() {
     const pittsburgh = await d3.json("./datasets/pittsburgh_neighborhoods.json");
@@ -335,7 +342,7 @@
         .enter()
         .append('image')
         .attr("class", "poi")
-        .attr('xlink:href','mapmarker.png')
+        .attr('xlink:href', d => typeToIconMap[d.type])
         .attr("x", d => d.Position[0] - 10) // slight adjustment bc image starts from top-left
         .attr("y", d => d.Position[1] - 10) // slight adjustment bc image starts from top-left
         .attr("opacity", 1)
