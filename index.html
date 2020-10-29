@@ -7,6 +7,8 @@
   <script src="https://d3js.org/topojson.v2.min.js"></script>
   <script src="./helper.js"></script>
   <link rel="stylesheet" type="text/css" href="css/slider-css.css" media="all" />
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@700&display=swap" rel="stylesheet">
+  <!-- “Music from https://www.zapsplat.com“ -->
   <audio id="active_audio" loop="true">
     <source src="./audio/active_audio.mp3" type='audio/mpeg; codecs="mp3"'>
   </audio>
@@ -28,7 +30,7 @@
   <style>
     body {
       background-color: #FAFAFA;
-      font-family: "Verdana", Geneva, sans-serif;
+      font-family: "Karla", "Verdana", Geneva, sans-serif;
       font-weight: 400;
     }
 
@@ -50,7 +52,15 @@
       stroke-width: 2px;
     }
 
-    #pittsburghmap{
+    #pittsburghmap {
+      border-radius: 20px;
+      background: #fafafa;
+      box-shadow: inset 5px 5px 10px #d5d5d5,
+                  inset -5px -5px 10px #ffffff;
+    }
+
+    #instructions {
+      width: 250px;
       border-radius: 20px;
       background: #fafafa;
       box-shadow: inset 5px 5px 10px #d5d5d5,
@@ -63,7 +73,7 @@
     }
 
     .selection {
-      font-family: Lato;
+      font-family: "Karla";
       font-size: 14px;
       font-weight: bold;
       border-style: none;
@@ -78,7 +88,7 @@
     }
 
     .choiceSelection {
-      font-family: Lato;
+      font-family: "Karla";
       font-size: 14px;
       font-weight: bold;
       border-style: none;
@@ -93,7 +103,7 @@
 
     #restart {
       align-items: center;
-      font-family: Lato;
+      font-family: "Karla";
       font-size: 14px;
       font-weight: bold;
       border-style: none;
@@ -118,13 +128,14 @@
     }
 
     #matching{
+      background: #fefaf2;
       width: 500px;
       height: 500px;
       padding: 50px 50px;
       margin-left: 30px;
       border-radius: 50px;
-      background: #FAFAFA;
-      box-shadow:  20px 20px 60px #d5d5d5,
+      /* background: #FAFAFA; */
+      box-shadow:  20px 20px 60px #d8d5ce,
                    -20px -20px 60px #ffffff;
     }
 
@@ -183,7 +194,6 @@
   // TODO: edit
   let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "image_url":"http://s3-media1.fl.yelpcdn.com/bphoto/l2XybXUHmdaHGhX9Ju8HZw/ms.jpg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food", "image_url":""}];
 
-
   let sortedData = [];
   let result = [];
   let projection;
@@ -194,6 +204,7 @@
     "nightlife": "./images/nightlife_icon.svg",
     "shopping": "./images/shopping_icon.svg",
   };
+  let musicPlaying = false;
 
   const requestData = async function() {
     const pittsburgh = await d3.json("./datasets/pittsburgh_neighborhoods.json");
@@ -257,11 +268,11 @@
     stereoDiv.html("");
 
     // add sliders to html
-    addSlider(stereoDiv, "active", "-80px", "100px");
-    addSlider(stereoDiv, "arts", "-200px", "100px");
-    addSlider(stereoDiv, "food", "90px", "83px");
-    addSlider(stereoDiv, "nightlife", "-200px", "275px", false);
-    addSlider(stereoDiv, "shopping", "5px", "350px", false);
+    addSlider(stereoDiv, "active", "-80px", "110px");
+    addSlider(stereoDiv, "arts", "-200px", "110px");
+    addSlider(stereoDiv, "food", "90px", "93px");
+    addSlider(stereoDiv, "nightlife", "-200px", "285px", false);
+    addSlider(stereoDiv, "shopping", "5px", "360px", false);
 
     // add icons for sliders
     addSliderIcon(stereoDiv, "active_icon", "active", "./images/active_icon.svg");
@@ -270,11 +281,24 @@
     addSliderIcon(stereoDiv, "nightlife_icon", "nightlife", "./images/nightlife_icon.svg", false);
     addSliderIcon(stereoDiv, "shopping_icon", "shopping", "./images/shopping_icon.svg", false);
 
+    // add instructions
+    stereoDiv.append("p")
+      .attr("id", "instructions")
+      .html("<b>Travel Instructions</b><br/>Step 1: Customize your vibe.<br/>Step 2: Swipe for the perfect match.<br/>Step 3: Review your itenerary.");
+
+    var instructions = document.getElementById("instructions");
+    instructions.style.position = "relative";
+    instructions.style.padding = "15px";
+    instructions.style.left = "245px";
+    instructions.style.top = "-75px";
+    instructions.style.lineHeight = "150%";
+
     // add button for saving music selection and navigating to recommendations
     stereoDiv.append("input")
       .attr("type", "button")
       .attr("class", "selection")
-      .attr("value", "Save music selection")
+      .attr("id", "vibe_button")
+      .attr("value", "That's my vibe! ✨")
       .on("click", function() {
         data.forEach(d => {
           d.Position = projection([d.longitude, d.latitude]);
@@ -282,7 +306,78 @@
 
         nextRecommendation(0);
       });;
+
+    var vibeButton = document.getElementById("vibe_button");
+    vibeButton.style.position = "relative";
+    vibeButton.style.left = "250px";
+    vibeButton.style.top = "-300px";
+
+    var playPauseButton = document.getElementById("vibe_button");
+    playPauseButton.style.position = "relative";
+    playPauseButton.style.left = "250px";
+    playPauseButton.style.top = "-300px";
+
+    // add pulsing circle
+    var pulseSvg = stereoDiv.append("svg")
+      .attr("id", "pulseSvg")
+      .attr("width", "250px")
+      .attr("height", "250px");
+
+    var pulse = document.getElementById("pulseSvg");
+      pulse.style.position = "relative";
+      pulse.style.left = "25px";
+      pulse.style.top = "0px";
+
+    var circle = d3.select("#pulseSvg");
+    circle.append("circle")
+      .attr("id", "pulseCircle")
+      .attr("cx", 125)
+      .attr("cy", 125)
+      .attr("r", 80)
+      .style("stroke", "#fdb73f")
+      .style("fill", "#fdb73f");
+
+    circle.append("circle")
+        .attr("cx", 125)
+        .attr("cy", 125)
+        .attr("r", 70)
+        .style("stroke", "#fdd389")
+        .style("fill", "none");
+    circle.append("circle")
+        .attr("cx", 125)
+        .attr("cy", 125)
+        .attr("r", 42)
+        .style("stroke", "#fdd389")
+        .style("fill", "none");
+    circle.append("circle")
+        .attr("cx", 125)
+        .attr("cy", 125)
+        .attr("r", 40)
+        .style("stroke", "#fcb131")
+        .style("fill", "#fcb131");
   }
+
+  function pulseCircle(circle) {
+      function repeat() {
+          circle
+            .transition()
+            .duration(500)
+            .attr("stroke-width", 0)
+            .attr('stroke-opacity', 0)
+            .transition()
+            .duration(500)
+            .attr("stroke-width", 0)
+            .attr('stroke-opacity', 0.5)
+            .transition()
+            .duration(2000)
+            .attr("stroke-width", 100)
+            .attr('stroke-opacity', 0)
+            .ease(d3.easeSin)
+            .on("end", repeat);
+        }
+
+        repeat();
+     }
 
   function addSliderIcon(stereoDiv, id, sliderId, img_src, rotate = true) {
     stereoDiv.append("img")
@@ -326,10 +421,10 @@
     slider.oninput = function() {
       var audio = document.getElementById(sliderId + "_audio");
       var sliderValue = this.value/10;
+      musicPlaying = true;
       audio.volume = sliderValue;
       audio.play();
-
-
+      checkTotalIsZero();
       data = regenerateMapPointers();
       data.forEach(d => {
         d.Position = projection([d.longitude, d.latitude]);
@@ -339,6 +434,26 @@
     };
   }
 
+  function checkTotalIsZero() {
+    var activeAudio = document.getElementById("active");
+    var artsAudio = document.getElementById("arts");
+    var foodAudio = document.getElementById("food");
+    var nightlifeAudio = document.getElementById("nightlife");
+    var shoppingAudio = document.getElementById("shopping");
+
+    var total = activeAudio.value + artsAudio.value + foodAudio.value +
+      nightlifeAudio.value + shoppingAudio.value;
+
+      console.log(activeAudio.value);
+
+    if (total == 0) {
+      d3.select("#pulseCircle").transition()
+               .duration(0);;
+    } else {
+      pulseCircle(d3.select("#pulseCircle"))
+    }
+  }
+
   function pauseAudio() {
     var activeAudio = document.getElementById("active_audio");
     var artsAudio = document.getElementById("arts_audio");
@@ -346,11 +461,17 @@
     var nightlifeAudio = document.getElementById("nightlife_audio");
     var shoppingAudio = document.getElementById("shopping_audio");
 
-    activeAudio.volume = 0;
-    artsAudio.volume = 0;
-    foodAudio.volume = 0;
-    nightlifeAudio.volume = 0;
-    shoppingAudio.volume = 0;
+    activeAudio.pause();
+    artsAudio.pause();
+    foodAudio.pause();
+    nightlifeAudio.pause();
+    shoppingAudio.pause();
+
+    activeAudio.currentTime = 0;
+    artsAudio.currentTime = 0;
+    foodAudio.currentTime = 0;
+    nightlifeAudio.currentTime = 0;
+    shoppingAudio.currentTime = 0;
   }
 
   function regenerateMapPointers() {
@@ -423,12 +544,12 @@
     var yes = choiceDiv.append("input")
                     .attr("type", "button")
                     .attr("class", "choiceSelection")
-                    .attr("value", "Yes, I would love to visit🤩");
+                    .attr("value", "Yes, I would love to visit 🤩");
 
     var no = choiceDiv.append("input")
                    .attr("type", "button")
                    .attr("class", "choiceSelection")
-                   .attr("value", "Nah, not for me🤧");
+                   .attr("value", "Nah, not for me 🤧");
 
     //if clicking on yes, add the data to the dictionary for final result, proceed to next question
     yes.on("click", function(d, i) {
@@ -482,14 +603,15 @@
     d3.select("#matching")
       .append("button")
       .attr("id", "restart")
-      .html("Generate new itinerary🙌");
+      .html("Generate new itinerary 🙌");
 
     d3.select("#restart")
       .on("click", function() {
         d3.selectAll('image').remove();
         d3.selectAll('text').remove();
         result = [];
-        pauseAudio();   
+        musicPlaying = false;
+        pauseAudio();
         drawStereoVis(sortedData, projection);
         return false;
     });
