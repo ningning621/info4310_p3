@@ -17,7 +17,7 @@
     <source src="./audio/food_audio.mp3" type='audio/mpeg; codecs="mp3"'>
   </audio>
   <audio id="nightlife_audio" loop="true">
-    <source src="./audio/arts_audio.mp3" type='audio/mpeg; codecs="mp3"'>
+    <source src="./audio/nightlife_audio.mp3" type='audio/mpeg; codecs="mp3"'>
   </audio>
   <audio id="shopping_audio" loop="true">
     <source src="./audio/shopping_audio.mp3" type='audio/mpeg; codecs="mp3"'>
@@ -327,13 +327,9 @@
     slider.oninput = function() {
       var audio = document.getElementById(sliderId + "_audio");
       var sliderValue = this.value/10;
+      audio.volume = sliderValue;
+      audio.play();
 
-      if (sliderValue == 0) {
-        audio.pause();
-      } else {
-        audio.volume = sliderValue;
-        audio.play();
-      }
 
       data = regenerateMapPointers();
       data.forEach(d => {
