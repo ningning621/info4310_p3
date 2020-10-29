@@ -161,19 +161,19 @@
     stereoDiv.append("img")
       .attr("id", id)
       .attr("src", img_src)
-      .attr("width", "26px")
-      .attr("height", "26px");
+      .attr("width", "50px")
+      .attr("height", "50px");
 
     var slider = document.getElementById(sliderId).getBoundingClientRect();
     var icon = document.getElementById(id);
 
     if (rotate) {
       icon.style.position = "absolute";
-      icon.style.top = (slider.top-30)+"px";
-      icon.style.left = (slider.left-8)+"px";
+      icon.style.top = (slider.top-55)+"px";
+      icon.style.left = (slider.left-19)+"px";
     } else {
       icon.style.position = "absolute";
-      icon.style.top = (slider.top-20)+"px";
+      icon.style.top = (slider.top-30)+"px";
       icon.style.left = (slider.left+215)+"px";
     }
   }
@@ -346,8 +346,8 @@
         .attr("x", d => d.Position[0] - 10) // slight adjustment bc image starts from top-left
         .attr("y", d => d.Position[1] - 10) // slight adjustment bc image starts from top-left
         .attr("opacity", 1)
-        .attr("width", 20)
-        .attr("height", 20)
+        .attr("width", 32)
+        .attr("height", 32)
   }
 
   // responsible for appending the map pointer labels
