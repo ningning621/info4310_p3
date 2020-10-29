@@ -13,20 +13,33 @@
   <style>
     body {
       background-color: #FAFAFA;
-      font-family: 'Lato', 'Helvetica', sans-serif;
+      font-family: "Verdana", Geneva, sans-serif;
       font-weight: 400;
     }
 
     h1 {
+      font-size: 24px;
       text-align: center;
       font-weight: 700;
       margin-bottom: 20px;
+    }
+
+    p.instruction{
+      text-align: center;
+      font-size: 12px;
     }
 
     .neighborhood {
       fill: #EEEEEE;
       stroke: white;
       stroke-width: 2px;
+    }
+
+    #pittsburghmap{
+      border-radius: 20px;
+      background: #fafafa;
+      box-shadow: inset 5px 5px 10px #d5d5d5,
+                  inset -5px -5px 10px #ffffff;
     }
 
     #tinder{
@@ -42,10 +55,11 @@
       width: 200px;
       height:40px;
       border-radius: 50px;
-      background: #fdb73f;
+      /* background: #fdb73f; */
       margin-left: 40px;
-      box-shadow:  5px 5px 10px #d5d5d5,
-                   0px 0px 10px #ffffff;
+      background: linear-gradient(225deg, #e4a539, #ffc443);
+      box-shadow:  5px 5px 10px #c38d31,
+                 -5px -5px 10px #ffe14d;
     }
 
     .choiceSelection {
@@ -57,9 +71,9 @@
       height:40px;
       border-radius: 50px;
       margin: 10px;
-      background: #fdb73f;
-      box-shadow:  5px 5px 10px #d5d5d5,
-                   0px 0px 10px #ffffff;
+      background: linear-gradient(225deg, #e4a539, #ffc443);
+      box-shadow:  5px 5px 10px #c38d31,
+                 -5px -5px 10px #ffe14d;
     }
 
     #restart {
@@ -73,9 +87,9 @@
       border-radius: 50px;
       margin: 10px;
       margin-top: 50px;
-      background: #fdb73f;
-      box-shadow:  5px 5px 10px #d5d5d5,
-                   0px 0px 10px #ffffff;
+      background: linear-gradient(225deg, #e4a539, #ffc443);
+      box-shadow:  5px 5px 10px #c38d31,
+                 -5px -5px 10px #ffe14d;
     }
 
     img.location_image {
@@ -83,9 +97,9 @@
       margin-top: 10px;
       margin-bottom: 20px;
       border-radius: 30px;
-      background: #fdb230;
-      box-shadow:  5px 5px 10px #d5d5d5,
-                   0px 0px 10px #ffffff;
+      /* background: #fafafa; */
+      box-shadow: inset 20px 20px 60px #d5d5d5,
+                  inset -20px -20px 60px #ffffff;
     }
 
     #matching{
@@ -134,7 +148,7 @@
   <div>
   <svg id="pittsburghmap" height="600" width="750" style="background: #fff; margin-left:50px" >
   </div>
-  <div style="margin-left: 80px" id="matching">
+  <div style="margin-left: 60px" id="matching">
     <!-- <h2>Go through the set of Pittsburgh locations recommended based on your preferred vibes!</h2>
     <div>
     <button href="#" id="start">Start!</button>
@@ -152,7 +166,9 @@
   const map = svg.append("g")
                   .attr("transform","translate("+margin.left+","+margin.top+")");
   // TODO: edit
-  let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "image_url":"http://s3-media1.fl.yelpcdn.com/bphoto/l2XybXUHmdaHGhX9Ju8HZw/ms.jpg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food", "image_url":""}, {"name":"location 3" , "url":"www.google.com", "review count":3, "rating":3, "neighborhood":"test 3", "latitude":40.428219, "longitude":-79.97583, "category":"life", "type":"life", "image_url":"http://s3-media2.fl.yelpcdn.com/bphoto/yY7ESIgVEh7oPc-Qg06O3g/ms.jpg"}];
+  let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "image_url":"http://s3-media1.fl.yelpcdn.com/bphoto/l2XybXUHmdaHGhX9Ju8HZw/ms.jpg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food", "image_url":""}];
+
+
   let sortedData = [];
   let result = [];
   let projection;
@@ -353,14 +369,14 @@
           .attr("class", "metadata")
           .html(category + " · " + neighborhood + " · Average rating: " + rating + " ("+reviewCount+" reviews)")
 
-    prompt.append("img").attr("src", image_url).attr("class", "location_image")
+    prompt.append("img").attr("src", image_url).attr("class", "location_image");
     // prompt.append("p").attr("id", "category").html("Category: "+category);
     // prompt.append("p").attr("id", "type").html("Type: "+type);
     // prompt.append("p").attr("id", "neighborhood").html("Neighborhood: "+neighborhood);
     // prompt.append("p").attr("id", "rating").html("Rating: "+rating);
     // prompt.append("p").attr("id", "review-count").html("Review Count: "+reviewCount);
-    prompt.append("br")
-    prompt.append("a").attr("id", "url").html("View more details →").attr("href", url);
+    prompt.append("br");
+    prompt.append("a").attr("id", "url").html("View more details →").attr("href", url).attr("target", "_blank");
 
     // Add map pointers to map svg
     drawMapPointers(data);
