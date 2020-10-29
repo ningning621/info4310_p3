@@ -282,7 +282,6 @@
 
         nextRecommendation(0);
       });;
-
   }
 
   function addSliderIcon(stereoDiv, id, sliderId, img_src, rotate = true) {
@@ -338,6 +337,20 @@
       map.selectAll("image").remove();
       drawMapPointers(data);
     };
+  }
+
+  function pauseAudio() {
+    var activeAudio = document.getElementById("active_audio");
+    var artsAudio = document.getElementById("arts_audio");
+    var foodAudio = document.getElementById("food_audio");
+    var nightlifeAudio = document.getElementById("nightlife_audio");
+    var shoppingAudio = document.getElementById("shopping_audio");
+
+    activeAudio.volume = 0;
+    artsAudio.volume = 0;
+    foodAudio.volume = 0;
+    nightlifeAudio.volume = 0;
+    shoppingAudio.volume = 0;
   }
 
   function regenerateMapPointers() {
@@ -476,6 +489,7 @@
         d3.selectAll('image').remove();
         d3.selectAll('text').remove();
         result = [];
+        pauseAudio();   
         drawStereoVis(sortedData, projection);
         return false;
     });
