@@ -5,6 +5,7 @@
   <link rel="shortcut icon" href="#"/>
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <script src="https://d3js.org/topojson.v2.min.js"></script>
+  <script src="./helper.js"></script>
   <link rel="stylesheet" type="text/css" href="css/slider-css.css" media="all" />
 
   <title>Pittsburgh Itinerary, Exclusively Yours</title>
@@ -87,18 +88,20 @@
                   .attr("transform","translate("+margin.left+","+margin.top+")");
   // TODO: edit
   let data = [{"name":"21st Street Coffee And Tea", "url":"http://www.yelp.com/biz/21st-street-coffee-and-tea-pittsburgh-2?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "image_url":"http://s3-media1.fl.yelpcdn.com/bphoto/l2XybXUHmdaHGhX9Ju8HZw/ms.jpg", "review count":36, "rating":4, "neighborhood":"Downtown" , "latitude":40.44131, "longitude":-80.00121, "category":"coffee", "type":"food"}, {"name":"A & B Doughnuts", "url":"http://www.yelp.com/biz/a-and-b-doughnuts-homestead?utm_campaign=yelp_api&utm_medium=api_v2_business&utm_source=ERehee8c-xBF5R86JGKbYg", "review count":2, "rating":5, "neighborhood":"Homestead", "latitude":40.40867615, "longitude":-79.90471649, "category":"donuts", "type":"food", "image_url":""}, {"name":"location 3" , "url":"www.google.com", "review count":3, "rating":3, "neighborhood":"test 3", "latitude":40.428219, "longitude":-79.97583, "category":"life", "type":"life", "image_url":"http://s3-media2.fl.yelpcdn.com/bphoto/yY7ESIgVEh7oPc-Qg06O3g/ms.jpg"}];
-
-  // console.log(data);
+  let sortedData = [];
+  let result = [];
+  let projection;
 
   const requestData = async function() {
     const pittsburgh = await d3.json("./datasets/pittsburgh_neighborhoods.json");
-
+    let yelpData = await d3.csv("./datasets/yelp_pittsburgh_filtered.csv");
+    sortedData = sortDataByType(yelpData);
     var neighborhoods = topojson.feature(pittsburgh, pittsburgh.objects.Neighborhoods_);
 
     // We use Mercator projection instead of a "better" projection because it's more familiar
     // It also leads to a flat line on the bottom of the city due to how the projection makes all
     //  latitude lines flat (which allows rhumb line equivalency)
-    var projection = d3.geoMercator().fitSize([mapWidth, mapHeight], neighborhoods);
+    projection = d3.geoMercator().fitSize([mapWidth, mapHeight], neighborhoods);
     var path = d3.geoPath().projection(projection);
 
     // Draw neighborhoods
@@ -116,7 +119,7 @@
     // };
 
 
-    drawStereoVis();
+    drawStereoVis(sortedData, projection);
 
     //initialize an empty dictionary for results
     var result = [];
@@ -126,7 +129,7 @@
     // });
   }
 
-  function drawStereoVis() {
+  function drawStereoVis(sortedData, projection) {
     var stereoDiv = d3.select("#matching");
     stereoDiv.html("");
 
@@ -139,12 +142,24 @@
 
     // add icons for sliders
     // Hamburger by MHD AZMI DWIPRANATA from the Noun Project
+    // TODO: add more icons
     addSliderIcon(stereoDiv, "active_icon", "active", "./images/hamburger_icon.svg");
     addSliderIcon(stereoDiv, "arts_icon", "arts", "./images/hamburger_icon.svg");
     addSliderIcon(stereoDiv, "food_icon", "food", "./images/hamburger_icon.svg");
     addSliderIcon(stereoDiv, "nightlife_icon", "nightlife", "./images/hamburger_icon.svg", false);
     addSliderIcon(stereoDiv, "shopping_icon", "shopping", "./images/hamburger_icon.svg", false);
 
+    stereoDiv.append("input")
+      .attr("type", "button")
+      .attr("class", "selection")
+      .attr("value", "Save music selection")
+      .on("click", function() {
+        data.forEach(d => {
+          d.Position = projection([d.longitude, d.latitude]);
+        });
+
+        nextRecommendation(0);
+      });;
 
   }
 
@@ -171,7 +186,7 @@
 
   function addSlider(stereoDiv, sliderId, leftPosition, topPositon, rotate = true) {
     stereoDiv.append("input")
-      .attr("min", 1)
+      .attr("min", 0)
       .attr("max", 10)
       .attr("value", 0)
       .attr("type", "range")
@@ -185,9 +200,36 @@
 
     if (rotate) {
       slider.style.transform = "rotate(270deg)";
-
-    } else {
     }
+
+    slider.oninput = function() {
+      data = regenerateMapPointers();
+      data.forEach(d => {
+        d.Position = projection([d.longitude, d.latitude]);
+      });
+      map.selectAll("image").remove();
+      drawMapPointers(data);
+    };
+  }
+
+  function regenerateMapPointers() {
+    var activeSlider = document.getElementById("active");
+    var artsSlider = document.getElementById("arts");
+    var foodSlider = document.getElementById("food");
+    var nightSlider = document.getElementById("nightlife");
+    var shopSlider = document.getElementById("shopping");
+
+    var total = parseInt(activeSlider.value) + parseInt(artsSlider.value)
+        + parseInt(foodSlider.value) + parseInt(nightSlider.value)
+        + parseInt(shopSlider.value);
+
+    return [].concat(
+      getListByTypeAndAmt(sortedData["active"], Math.floor(parseInt(activeSlider.value)*10/total)),
+      getListByTypeAndAmt(sortedData["arts"], Math.floor(parseInt(artsSlider.value)*10/total)),
+      getListByTypeAndAmt(sortedData["food"], Math.floor(parseInt(foodSlider.value)*10/total)),
+      getListByTypeAndAmt(sortedData["nightlife"], Math.floor(parseInt(nightSlider.value)*10/total)),
+      getListByTypeAndAmt(sortedData["shopping"], Math.floor(parseInt(shopSlider.value)*10/total))
+    )
   }
 
   // draw matching vis for each recommendation
@@ -291,8 +333,8 @@
       .on("click", function() {
         d3.selectAll('image').remove();
         d3.selectAll('text').remove();
-        nextRecommendation(0);
         result = [];
+        drawStereoVis();
         return false;
     });
   }

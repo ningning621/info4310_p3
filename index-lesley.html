@@ -44,11 +44,11 @@
 
         let curatedList = [];
         let finalList = curatedList.concat(
-          getListByTypeAndAmt(data["active"], Math.floor(parseInt(activeSlider.value)*10/total)),
-          getListByTypeAndAmt(data["arts"], Math.floor(parseInt(artsSlider.value)*10/total)),
-          getListByTypeAndAmt(data["food"], Math.floor(parseInt(foodSlider.value)*10/total)),
-          getListByTypeAndAmt(data["food"], Math.floor(parseInt(nightSlider.value)*10/total)),
-          getListByTypeAndAmt(data["food"], Math.floor(parseInt(shopSlider.value)*10/total))
+          getListByTypeAndAmt(data["active"], Math.ceil(parseInt(activeSlider.value)*10/total)),
+          getListByTypeAndAmt(data["arts"], Math.ceil(parseInt(artsSlider.value)*10/total)),
+          getListByTypeAndAmt(data["food"], Math.ceil(parseInt(foodSlider.value)*10/total)),
+          getListByTypeAndAmt(data["food"], Math.ceil(parseInt(nightSlider.value)*10/total)),
+          getListByTypeAndAmt(data["food"], Math.ceil(parseInt(shopSlider.value)*10/total))
         )
 
         console.log(finalList);
