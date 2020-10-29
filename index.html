@@ -112,21 +112,10 @@
       .attr("class", "neighborhood")
       .attr("d", path);
 
-    // // initiate the matching process
-    // document.getElementById("start").onclick = function() {
-    //   nextRecommendation(0);
-    //   return false;
-    // };
-
-
     drawStereoVis(sortedData, projection);
 
     //initialize an empty dictionary for results
     var result = [];
-
-    // data.forEach(d => {
-    //   d.Position = projection([d.longitude, d.latitude]);
-    // });
   }
 
   function drawStereoVis(sortedData, projection) {
@@ -141,13 +130,11 @@
     addSlider(stereoDiv, "shopping", "5px", "350px", false);
 
     // add icons for sliders
-    // Hamburger by MHD AZMI DWIPRANATA from the Noun Project
-    // TODO: add more icons
-    addSliderIcon(stereoDiv, "active_icon", "active", "./images/hamburger_icon.svg");
-    addSliderIcon(stereoDiv, "arts_icon", "arts", "./images/hamburger_icon.svg");
-    addSliderIcon(stereoDiv, "food_icon", "food", "./images/hamburger_icon.svg");
-    addSliderIcon(stereoDiv, "nightlife_icon", "nightlife", "./images/hamburger_icon.svg", false);
-    addSliderIcon(stereoDiv, "shopping_icon", "shopping", "./images/hamburger_icon.svg", false);
+    addSliderIcon(stereoDiv, "active_icon", "active", "./images/active_icon.svg");
+    addSliderIcon(stereoDiv, "arts_icon", "arts", "./images/arts_icon.svg");
+    addSliderIcon(stereoDiv, "food_icon", "food", "./images/food_icon.svg");
+    addSliderIcon(stereoDiv, "nightlife_icon", "nightlife", "./images/nightlife_icon.svg", false);
+    addSliderIcon(stereoDiv, "shopping_icon", "shopping", "./images/shopping_icon.svg", false);
 
     stereoDiv.append("input")
       .attr("type", "button")
