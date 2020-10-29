@@ -7,6 +7,21 @@
   <script src="https://d3js.org/topojson.v2.min.js"></script>
   <script src="./helper.js"></script>
   <link rel="stylesheet" type="text/css" href="css/slider-css.css" media="all" />
+  <audio id="active_audio" loop="true">
+    <source src="./audio/active_audio.mp3" type='audio/mpeg; codecs="mp3"'>
+  </audio>
+  <audio id="arts_audio" loop="true">
+    <source src="./audio/arts_audio.mp3" type='audio/mpeg; codecs="mp3"'>
+  </audio>
+  <audio id="food_audio" loop="true">
+    <source src="./audio/food_audio.mp3" type='audio/mpeg; codecs="mp3"'>
+  </audio>
+  <audio id="nightlife_audio" loop="true">
+    <source src="./audio/arts_audio.mp3" type='audio/mpeg; codecs="mp3"'>
+  </audio>
+  <audio id="shopping_audio" loop="true">
+    <source src="./audio/shopping_audio.mp3" type='audio/mpeg; codecs="mp3"'>
+  </audio>
 
   <title>Pittsburgh Itinerary, Exclusively Yours</title>
 
@@ -212,7 +227,6 @@
                  .on("zoom", mapZoomed);
 
     svg.call(zoom);
-
     svg.call(zoom.transform, d3.zoomIdentity);
 
     function mapZoomed() {
@@ -256,6 +270,7 @@
     addSliderIcon(stereoDiv, "nightlife_icon", "nightlife", "./images/nightlife_icon.svg", false);
     addSliderIcon(stereoDiv, "shopping_icon", "shopping", "./images/shopping_icon.svg", false);
 
+    // add button for saving music selection and navigating to recommendations
     stereoDiv.append("input")
       .attr("type", "button")
       .attr("class", "selection")
@@ -310,6 +325,16 @@
     }
 
     slider.oninput = function() {
+      var audio = document.getElementById(sliderId + "_audio");
+      var sliderValue = this.value/10;
+
+      if (sliderValue == 0) {
+        audio.pause();
+      } else {
+        audio.volume = sliderValue;
+        audio.play();
+      }
+
       data = regenerateMapPointers();
       data.forEach(d => {
         d.Position = projection([d.longitude, d.latitude]);
